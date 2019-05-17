@@ -2,12 +2,12 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>vkSegfault</title>
-    <description>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
+    <description>Vulkan, Game Engine, Physics, GPGPU
 </description>
-    <link>http://yourdomain.com/</link>
-    <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 10 Apr 2019 21:01:03 +0200</pubDate>
-    <lastBuildDate>Wed, 10 Apr 2019 21:01:03 +0200</lastBuildDate>
+    <link>https://vksegfault.github.io//</link>
+    <atom:link href="https://vksegfault.github.io//feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Fri, 17 May 2019 02:00:23 +0200</pubDate>
+    <lastBuildDate>Fri, 17 May 2019 02:00:23 +0200</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
     
       <item>
@@ -31,8 +31,8 @@
 
 </description>
         <pubDate>Sat, 24 Nov 2018 22:26:48 +0100</pubDate>
-        <link>http://yourdomain.com/jekyll/update/2018/11/24/welcome-to-jekyll.html</link>
-        <guid isPermaLink="true">http://yourdomain.com/jekyll/update/2018/11/24/welcome-to-jekyll.html</guid>
+        <link>https://vksegfault.github.io//jekyll/update/2018/11/24/welcome-to-jekyll.html</link>
+        <guid isPermaLink="true">https://vksegfault.github.io//jekyll/update/2018/11/24/welcome-to-jekyll.html</guid>
         
         
         <category>jekyll</category>
