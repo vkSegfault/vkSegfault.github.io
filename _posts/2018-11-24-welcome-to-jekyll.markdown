@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Welcome to Jekyll!"
+title:  "Using Vulkan in Rust - simplest possible way!"
 date:   2018-11-24 22:26:48 +0100
 categories: jekyll update
 ---
