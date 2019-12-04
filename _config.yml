@@ -9,7 +9,7 @@
 title: vkSegfault
 email: adtofaust@protonmail.com
 description: > # this means to ignore newlines until "baseurl:"
-    Vulkan, Game Engine, Physics, GPGPU
+    Vulkan, Game Engine, GPGPU, Machine Learning, HPC
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://vksegfault.github.io/" # the base hostname & protocol for your site
 github_username:  vkSegfault
