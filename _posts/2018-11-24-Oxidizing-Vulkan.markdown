@@ -2,7 +2,11 @@
 layout: post
 title:  "Oxidizing Vulkan!"
 date:   2018-11-24 22:26:48 +0100
-categories: jekyll update
+categories: vulkan, rust
+---
+
+> Update1: clarifications, updated LunarG structure
+
 ---
 
 Let's say you don't like using somebody's else Crates and you have enough time to rustify Vulkan on your own. Here I will show you how to not shoot yourself in the foot when calling Vulkan from `libvulkan.so` directly rather than some wrappers.
@@ -15,16 +19,15 @@ Agenda:
 
 # Extracting vulkan shared object
 
-This step is optional because you most probably have `libvulkan.so` already installed on your system - either by your OS or gpu drivers.
+This step is optional because you most probably have `libvulkan.so` already installed on your system - either by your OS (assuming Linux) or gpu drivers.
 
-For the sake of completness we are gone prepare eveything from scratch. Head to the `LunarG` website and download SDK bundle. After extracting head to `1.1.XXX.X/x86_64/lib` directory. We are intersted in 3 files - vulkan loader and symlinks (for future convenience):
+For the sake of completness we are gone prepare eveything from scratch. Head to the [LunarG](https://vulkan.lunarg.com/) website and download SDK bundle. After extracting head to `x86_64/lib/` directory. We are intersted in 1 file - vulkan loader: **libvulkan.so.1.2.131**.
+
+Copy them to your Rust project directory (prefferably in some nested folder to not clutter main one). Let's also prepare symlink just for ease of use (similar to what LunargG prepare for us):
+
 ```bash
-libvulkan.so
-libvulkan.so.1
-libvulkan.so.1.1.XXX
+ln -s libvulkan.so.1.2.131 libvulkan.so
 ```
-
-Copy them to your Rust project directory (prefferably in some nested folder to not clutter main one).
 
 # Linking against loader
 
@@ -37,7 +40,7 @@ fn main()
 }
 ```
 
-Path to loader is where you pasted 3 files mentioned in previous step.
+Path to loader is where you pasted loader and created symlink.
 
 # Rusty version of C API functions
 
