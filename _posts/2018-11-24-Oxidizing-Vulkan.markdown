@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Oxidizing Vulkan!"
+title:  "oxidize!(Vulkan)"
 date:   2018-11-24 22:26:48 +0100
 categories: vulkan, rust
 ---
