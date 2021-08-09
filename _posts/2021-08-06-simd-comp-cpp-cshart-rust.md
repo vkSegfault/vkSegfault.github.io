@@ -13,7 +13,7 @@ Everyone heard of SIMD, yet not so many use it. There are probably three main re
 
 ## Standarization
 
-C++ has no standarized SIMD usage at all, even for SSE instructions introduced 20 years ago, which are available for almost all x86_64 CPUs as of 2021. To use wide lanes directly we must provide compiler-specific headers and use all instructions directly. In case of GCC it all looks like this:
+C++ has no standarized SIMD usage at all, even for SSE instructions introduced 20 years ago, which are available for almost all x86_64 CPUs as of 2021. To use wide lanes we must provide compiler-specific headers and use all instructions directly. In case of GCC it all looks like this:
 ```cpp
 #include <xmmintrin.h>   //for SSE
 #include <emmintrin.h>   //SSE2
@@ -24,7 +24,7 @@ C++ has no standarized SIMD usage at all, even for SSE instructions introduced 2
 ```
 Although we have only this raw approach for now there is some work happening to standarize it in [future](https://en.cppreference.com/w/cpp/experimental/simd). It's worth mentioning that in the 90's ``valarray`` has been introduced.  Where vector and array are just templated containers without any mathematical meaning, vallarray was concept of array conataining numbers only, which can execute wide operations. Unfortunatelly development stalled.  and till today there is no exact matching to SIMD inctructions, so we must rely on auto vectorization.
 
-On the other hand C# had fully standarized SIMD usage since .NET Core 3.0. We don't have to bother about any intrinsics directly, everything is under nice high level constructs:
+At the other end of the spectrum there have been C# which had fully standarized SIMD usage ever since .NET Core 3.0. We don't have to bother about any intrinsics directly, everything is under nice high level constructs:
 ```csharp
 using System.Numerics;
 ```
@@ -37,11 +37,11 @@ use std::arch::x86_64::*;
 ```
 Ever since SIMD arch module introduction there was always some talk about creating portable (rusty) way to achieve wide lane instructions directly without compromising Rust safety and syntax. I've checked 2 previous attempts: [simd](https://crates.io/crates/simd) and it's successor [packed simd](https://crates.io/crates/packed_simd), but they are outdated and none of them compile as of rustc 1.51. The latest is [Portable SIMD Project Group](https://blog.rust-lang.org/inside-rust/2020/09/29/Portable-SIMD-PG.html). Once (or rather *if*) they finish we should be able to use constructs like `f32x4` directly with all mathematical operations on them.
 
-> For C++ and Rust this list of SIMD operations will definitely come in handy: [Intrinsics Guide](https://software.intel.com/sites/landingpage/IntrinsicsGuide)
+> For C++ and Rust this list of SIMD operations will definitely come in handy: [Intel Intrinsics Guide](https://software.intel.com/sites/landingpage/IntrinsicsGuide)
 
 ## Safety
 
-As you can blindly guess, C++ way of CPU intrinsics is not safe in any way. What will happen when you run instructions on hardware that does not support it is UB, and most probably segfault. There is a way though to ensure runtime safety, but once more not portable and it's called **CPUID**. Here is an example:
+As you can blindly guess, C++ way of CPU intrinsics is not safe in any way. What will happen when you run instructions on hardware that does not support it is UB, and most probably segfault. There is a way though to ensure runtime safety, but once more not portable. It's called **CPUID** and here is an example:
 ```cpp
 #include  <cpuid.h>
 
@@ -54,11 +54,11 @@ if ( info[2] & ((int)1 << 28) != 0 ) //check bit for AVX presence
 	//do something with AVX
 }
 ```
-C# on the other hand does everything fully safe and potentially faster (!). At least theoretically (depends whether JITted code optimilized for specific hardware gains more than CLR runtime workload - I imagine this may happen on modern CPUs that support AVX-512 for example). This code checks at runtime how wide (how many lanes) is the vector of SIMD data:
+C# on the other hand does everything fully safe and potentially faster (!). At least theoretically (depends whether JITted code optimized for specific hardware gains more than CLR runtime workload[^1]). This code checks at runtime how wide (how many lanes) is the vector of SIMD data:
 ```c#
 var  lanes = Vector<int>.Count;
 ```
-Of course, it implicitly match to SSE (4 lanes), AVX (8 lanes) or AVX-512 (16 lanes). While C++ and Rust must compile AOT and assume what is typical hardware your program will run on, C# doesn't need to. CLR compiles it JIT dynamically checking on what CPU it's running. If it finds that we are using  CPU modern enough to support e.g.: AVX512, why bother with something less wide? This is really elegant way to acomplish portable SIMD usage comparing to C++ and Rust which must struggle with compile time decisions.
+Of course, it implicitly matches to SSE (4 lanes), AVX (8 lanes) or AVX-512 (16 lanes). While C++ and Rust must compile AOT and assume what is typical hardware your program will run on, C# doesn't need to. CLR compiles it JIT dynamically checking on what CPU it's running. If it finds that we are using  CPU modern enough to support e.g.: AVX512, why bother with something less wide? This is really elegant way to acomplish portable SIMD usage comparing to C++ and Rust which must struggle with compile time decisions.
 
 Rust has some neat syntax to create different functions per every instruction family and then dynamically decide which one to run. First to hint **rustc** to compile some function with avx we need feature attribute:
 ```rust
@@ -130,7 +130,7 @@ let (mut v8a, mut v8s) = ( _mm256_setzero_ps(), _mm256_setzero_ps() );
 let arr: [f32; 1_200_000] = [ 23.74; 1_200_000 ];
 
 //first loop
-for i in  arr.iter().step_by(8) {
+for i in arr.iter().step_by(8) {
 	v8a = _mm256_loadu_ps( i );
 	v8s = _mm256_add_ps( v8s, v8a );
 }
@@ -167,7 +167,7 @@ core_simd = { git = "https://github.com/rust-lang/stdsimd" }
 
 ### Compiler flags
 
-One more thing worth mentioning are compiler flags. While CLR doesn't need anything for C++ and Rust to do, For GCC (unless it's SSE which doesn't need any flags) we need to pass **-mavx** or **-march=native**. Rustc on the other hand needs specific rustflags in .cargo/config.toml:
+One more thing worth mentioning are compiler flags. While CLR doesn't need anything, compilers for C++ and Rust must provide information what characteristics of CPU we want to activate. For GCC (unless it's SSE which can be compiled right away) we need to pass **-mavx** or **-march=native**. Rustc on the other hand needs specific rustflags in .cargo/config.toml:
 ```toml
 [build]
 rustflags = [ "-C", "target-feature=+avx,+avx2" ]
@@ -199,3 +199,4 @@ G_M19891_IG04: ;; offset=0152H
 000165  0F8CEFFEFFFF jl G_M19891_IG03
 ```
 
+[^1]: I imagine this may happen on modern CPUs that support AVX-512
