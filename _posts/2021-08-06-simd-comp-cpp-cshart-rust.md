@@ -172,7 +172,7 @@ One more thing worth mentioning are compiler flags. While CLR doesn't need anyth
 [build]
 rustflags = [ "-C", "target-feature=+avx,+avx2" ]
 ```
-> **rustflags** has a precedence over **attributes** !
+> **rustflags** have precedence over **attributes** !
 
 ## Bonus - veryfing assembly
 As small bonus: let's see how to check if our binaries are actually using AVX instructions. In C++ and Rust it's pretty straightforward, we have already compiled blob so we can use well known tool called **objdump** (*readelf* or *nm* will also do, if that's what you prefer):
