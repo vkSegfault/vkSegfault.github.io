@@ -160,7 +160,7 @@ arr.chunks(8).for_each(|chunk| {
 	v8s += v8a;
 });
 ```
-Notice how natural using `v8s += v8a` will be, which are just pure SIMD constructs. If you want to check outgoing efforts to stabilize it right now, add this as dependecy to your project:
+Notice how natural using `v8s += v8a` will be, those are just pure SIMD constructs. If you want to check outgoing efforts to stabilize it right now, add this as dependecy to your project:
 ```bash
 core_simd = { git = "https://github.com/rust-lang/stdsimd" }
 ```
