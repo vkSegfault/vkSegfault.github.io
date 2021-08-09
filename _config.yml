@@ -46,11 +46,11 @@ social:
   email: a.jurczak@protonmail.com             # change to your email address
   links:
     # The first element serves as the copyright owner's link
+    - https://www.linkedin.com/in/adrian-jurczak-530aba192/
     - https://twitter.com/username      # change to your twitter homepage
     - https://gitlab.com/username       # change to your github homepage
     # Uncomment below to add more social links
     # - https://www.facebook.com/username
-    - https://www.linkedin.com/in/adrian-jurczak-530aba192/
 
 google_site_verification: google_meta_tag_verification # change to your verification string
 
@@ -58,7 +58,7 @@ google_site_verification: google_meta_tag_verification # change to your verifica
 
 
 google_analytics:
-  id: ''              # fill in your Google Analytics ID
+  id: 'G-RSW0NEDL8V'              # fill in your Google Analytics ID
   # Google Analytics pageviews report settings
   pv:
     proxy_endpoint:   # fill in the Google Analytics superProxy endpoint of Google App Engine
