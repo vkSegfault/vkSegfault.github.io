@@ -775,7 +775,7 @@ $sidebar-display: "sidebar-display";
 
   .sidebar-bottom {
     font-size: 1.2rem;
-    margin-bottom: 3.1rem;
+    margin-bottom: 4.1rem;
 
     @include ml-mr(auto);
     @include pl-pr(1rem);
@@ -807,8 +807,8 @@ $sidebar-display: "sidebar-display";
     .icon-border {
       background-color: #525354;
       content: "";
-      width: 3px;
-      height: 3px;
+      width: 5px;
+      height: 5px;
       border-radius: 50%;
       position: relative;
       top: 12px;
