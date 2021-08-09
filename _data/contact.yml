@@ -6,7 +6,7 @@
   url:  'https://www.linkedin.com/in/adrian-jurczak-530aba192/'                  # Fill with your Linkedin homepage
 -
   type: github
-  icon: 'fab fa-github-alt'
+  icon: 'fab fa-gitlab-alt'
 -
   type: twitter
   icon: 'fab fa-twitter'
@@ -14,10 +14,10 @@
   type: email
   icon: 'fas fa-envelope'
   noblank: true            # open link in current tab
--
-  type: rss
-  icon: 'fas fa-rss'
-  noblank: true
+#-
+#  type: rss
+#  icon: 'fas fa-rss'
+#  noblank: true
 
 # Uncomment and complete the url below to enable more contact options
 # -
