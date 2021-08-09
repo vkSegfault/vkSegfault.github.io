@@ -145,8 +145,11 @@ let v8s_sliced = std::mem::transmute::< __m256, [f32; 8] >(v8s);
 ```
 
 Rust is pretty straightforward if you are already familiar with syntax, but there are few things to note here. 
+
 Example shows 2 loops, one using iterators and one chunks. It was not clear at first but for faster computations we should go with functional style. ***For loop*** uses iterators which are indirection to data, this is pretty significant with high performance code. Chunks approach on the other hand operates on raw data, which results in faster compute times.
+
 Another thing worth mentioning is **mem::transmute**. This fn is responsible for bitcasting and under the hood it's just union type.
+
 And last but not least fact is that arrays in rust  does not hold aligment requirements by default. That's why we need to use `_mm256_loadu_ps` instead of `_mm256_load_ps` (notice lack of `u`).  
 
 Once **std::simd** stabilization finishes we can expect more rusty syntax:
@@ -157,8 +160,7 @@ arr.chunks(8).for_each(|chunk| {
 	v8s += v8a;
 });
 ```
-Notice how natural using `v8s += v8a` will be, which are just pure SIMD constructs. ~~We will be able to use~~ 
-If you want to check right now outgoing efforts to stabilize it, add this as dependecy to your project:
+Notice how natural using `v8s += v8a` will be, which are just pure SIMD constructs. If you want to check outgoing efforts to stabilize it right now, add this as dependecy to your project:
 ```bash
 core_simd = { git = "https://github.com/rust-lang/stdsimd" }
 ```
