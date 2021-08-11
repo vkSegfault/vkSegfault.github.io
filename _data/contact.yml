@@ -14,10 +14,10 @@
 -
   type: github
   icon: 'fab fa-gitlab'
-#-
-#  type: rss
-#  icon: 'fas fa-rss'
-#  noblank: true
+-
+  type: rss
+  icon: 'fas fa-rss'
+  noblank: true
 
 # Uncomment and complete the url below to enable more contact options
 # -
