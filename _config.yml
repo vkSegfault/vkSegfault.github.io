@@ -34,7 +34,7 @@ description: >-                        # used by seo meta and the atom feed
 url: 'https://vksegfault.github.io/'
 
 github:
-  username: vksegfault             # change to your github username
+  username: adtofaust             # change to your github username
 
 twitter:
   username: vksegfault            # change to your twitter username
@@ -48,7 +48,7 @@ social:
     # The first element serves as the copyright owner's link
     - https://www.linkedin.com/in/adrian-jurczak-530aba192/
     - https://twitter.com/username      # change to your twitter homepage
-    - https://gitlab.com/username       # change to your github homepage
+    - https://gitlab.com/adtofaust    # change to your github homepage
     # Uncomment below to add more social links
     # - https://www.facebook.com/username
 
