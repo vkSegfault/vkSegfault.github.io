@@ -150,7 +150,7 @@ Example shows 2 loops, one using iterators and one chunks. It was not clear at f
 
 Another thing worth mentioning is **mem::transmute**. This fn is responsible for bitcasting and under the hood it's just union type.
 
-And last but not least fact is that arrays in rust  does not hold aligment requirements by default. That's why we need to use `_mm256_loadu_ps` instead of `_mm256_load_ps` (notice lack of `u`).  
+And last but not least fact is that arrays in rust do not hold aligment requirements by default. That's why we need to use `_mm256_loadu_ps` instead of `_mm256_load_ps` (notice lack of `u`).  
 
 Once **std::simd** stabilization finishes we can expect more rusty syntax:
 ```rust
