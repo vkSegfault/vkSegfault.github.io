@@ -1,5 +1,5 @@
 ---
-title: SIMD usage in C++, C# and RUST
+title: SIMD usage in C++, C# and Rust
 categories: [CPU, SIMD]
 tags: [cpu, simd, cpp, csharp, rust]     # TAG names should always be lowercase
 ---
