@@ -20,12 +20,12 @@ C++ has no standarized SIMD usage at all, even for SSE instructions introduced 2
 #include <pmmintrin.h>   //SSE3
 #include <smmintrin.h>   //SSE4.1
 #include <nmmintrin.h>   //SSE4.2
-#include <immintrin.h>   //AVX, AVX2, AVX512
+#include <immintrin.h>   //AVX, AVX2, AVX-512
 ```
-Although we have only this raw approach for now there is some work happening to standarize it in [future](https://en.cppreference.com/w/cpp/experimental/simd). It's worth mentioning that in the 90's ``valarray`` has been introduced.  Where vector and array are just templated containers without any mathematical meaning, vallarray was concept of array conataining numbers only, which can execute wide operations. Unfortunatelly development stalled.  and till today there is no exact matching to SIMD inctructions, so we must rely on auto vectorization.
+All SSE includes give us `__m128` types while `immintrin.h` results in `__m256` and `__m512`. Although we have only this raw approach for now there is some work happening to standarize it in [future](https://en.cppreference.com/w/cpp/experimental/simd). It's worth mentioning that in the 90's ``valarray`` has been introduced.  Where vector and array are just templated containers without any mathematical meaning, vallarray was concept of array conataining numbers only, which can execute wide operations. Unfortunatelly development stalled and till today there is no exact matching to SIMD inctructions, so we must rely on auto vectorization.
 
 At the other end of the spectrum there have been C# which had fully standarized SIMD usage ever since .NET Core 3.0. We don't have to bother about any intrinsics directly, everything is under nice high level constructs:
-```csharp
+```c#
 using System.Numerics;
 ```
 From now on you can use types such a `Vector2`, `Vector3`, `Vector4` and `Matrix3x2`, `Matrix4x4`. There are even more specialized types like `Plane` or `Quaternion`. All those use single precission floating point numbers. If you want use doubles or ints and wider operations you can use `Vector<T>` type which also let you write hardware independent code.
@@ -56,9 +56,9 @@ if ( info[2] & ((int)1 << 28) != 0 ) //check bit for AVX presence
 ```
 C# on the other hand does everything fully safe and potentially faster (!). At least theoretically (depends whether JITted code optimized for specific hardware gains more than CLR runtime workload[^1]). This code checks at runtime how wide (how many lanes) is the vector of SIMD data:
 ```c#
-var  lanes = Vector<int>.Count;
+var lanes = Vector<int>.Count;
 ```
-Of course, it implicitly matches to SSE (4 lanes), AVX (8 lanes) or AVX-512 (16 lanes). While C++ and Rust must compile AOT and assume what is typical hardware your program will run on, C# doesn't need to. CLR compiles it JIT dynamically checking on what CPU it's running. If it finds that we are using  CPU modern enough to support e.g.: AVX512, why bother with something less wide? This is really elegant way to acomplish portable SIMD usage comparing to C++ and Rust which must struggle with compile time decisions.
+Of course, it implicitly matches to SSE (4 lanes), AVX (8 lanes), AVX-512 (16 lanes) or - in case of no SIMD inctructions detected - scalar (1 lanes). While C++ and Rust must compile AOT and assume what is typical hardware your program will run on, C# doesn't need to. CLR compiles it JIT dynamically checking on what CPU it's running. If it finds that we are using  CPU modern enough to support e.g.: AVX-512, why bother with something less wide? This is really elegant way to acomplish portable SIMD usage comparing to C++ and Rust which must struggle with compile time decisions.
 
 Rust has some neat syntax to create different functions per every instruction family and then dynamically decide which one to run. First to hint **rustc** to compile some function with avx we need feature attribute:
 ```rust
@@ -82,66 +82,64 @@ if cfg!(target_feature = "avx") {
 
 Please note that all fn's that use **std::arch** module must be marked as **unsafe**!
 
-## Usage
+## Example
 Here we have simple loop example for every language that sums 256 bits vector from a big array.
 
 - C++
 
 ```cpp
-__m256  v8a;
-union { __m256  v8s; float  f8s[8]; };
-v8a = v8s = _mm256_setzero_ps();
+__m256  v8temp;
+union { __m256  v8sum; float  f8sum[8]; };
+v8temp = v8sum = _mm256_setzero_ps();
 
 std::array<float, 1'200'000> arr {};
 arr.fill( 23.74 );
 
 for( int  i = 0; i < arr.size(); i+=8 )
 {
-	v8a = _mm256_set_ps( arr[i+7], arr[i+6], arr[i+5], arr[i+4], arr[i+3], arr[i+2], arr[i+1], arr[i+0] );
-	v8s = _mm256_add_ps( v8s, v8a );
+	v8temp = _mm256_set_ps( arr[i+7], arr[i+6], arr[i+5], arr[i+4], arr[i+3], arr[i+2], arr[i+1], arr[i+0] );
+	v8sum = _mm256_add_ps( v8sum, v8temp );
 }
 ```
 
 - C#
 
-```csharp
+```c#
 var lanes = Vector<int>.Count;
 
-if( lanes > 0 )
-{
-	float[] arr = new  float[1_200_000];
-	Array.Fill<float>( arr, 23.74f );
+float[] arr = new  float[1_200_000];
+Array.Fill<float>( arr, 23.74f );
 	
-	var v8s = new Vector<float>();
+var v8sum = new Vector<float>();
 
-	for( int i = 0; i < arr.Length; i+=lanes )
-	{
-		var v8a = new Vector<float>( arr, i );
-		v8s += v8a;
-	}
+for( int i = 0; i < arr.Length; i+=lanes )
+{
+	var v8temp = new Vector<float>( arr, i );
+	v8sum += v8temp;
 }
 ```
-Note how inside if condition we don't operate on any specific size corresponding to SIMD lanes width. It's resolved at runtime and once it's written we don't need to worry about it (on my machine `v8s` vector resolved to 8 elements).
+
+Note how inside if condition we don't operate on any specific size corresponding to SIMD lanes width. It's resolved at runtime and once it's written we don't need to worry about it (on my machine `v8sum` vector resolved to 8 elements).
 
 - Rust
 
 ```rust
-let (mut v8a, mut v8s) = ( _mm256_setzero_ps(), _mm256_setzero_ps() );
+let (mut v8temp, mut v8sum) = ( _mm256_setzero_ps(), _mm256_setzero_ps() );
 let arr: [f32; 1_200_000] = [ 23.74; 1_200_000 ];
 
-//first loop
+//first version
 for i in arr.iter().step_by(8) {
-	v8a = _mm256_loadu_ps( i );
-	v8s = _mm256_add_ps( v8s, v8a );
+	v8temp = _mm256_loadu_ps( i );
+	v8sum = _mm256_add_ps( v8sum, v8temp );
 }
-let v8s_unpacked: (f32, f32, f32, f32, f32, f32, f32, f32) =  std::mem::transmute( v8s );
+let v8sum_unpacked: (f32, f32, f32, f32, f32, f32, f32, f32) =  std::mem::transmute( v8sum );
 
-//second loop
+//second version
 arr.chunks(8).for_each(|chunk| {
-	v8a = _mm256_loadu_ps( &chunk[0] );
-	v8s = _mm256_add_ps( v8s, v8a );
+	v8temp = _mm256_loadu_ps( &chunk[0] );
+	v8sum = _mm256_add_ps( v8sum, v8temp );
 } );
-let v8s_sliced = std::mem::transmute::< __m256, [f32; 8] >(v8s);
+let v8sum_sliced = std::mem::transmute::< __m256, [f32; 8] >(v8sum);
 ```
 
 Rust is pretty straightforward if you are already familiar with syntax, but there are few things to note here. 
@@ -154,13 +152,13 @@ And last but not least fact is that arrays in rust do not hold aligment requirem
 
 Once **std::simd** stabilization finishes we can expect more rusty syntax:
 ```rust
-let (mut v8a, mut v8s) = ( f32x8::splat(0.0), f32x8::splat(0.0) );
+let (mut v8temp, mut v8sum) = ( f32x8::splat(0.0), f32x8::splat(0.0) );
 arr.chunks(8).for_each(|chunk| {
-	v8a = f32x8::from_array( chunk.try_into().expect("") );
-	v8s += v8a;
+	v8temp = f32x8::from_array( chunk.try_into().expect("") );
+	v8sum += v8temp;
 });
 ```
-Notice how natural using `v8s += v8a` will be, those are just pure SIMD constructs. If you want to check outgoing efforts to stabilize it right now, add this as dependecy to your project:
+Notice how natural using `v8sum += v8temp` will be, those are just pure SIMD constructs. If you want to check outgoing efforts to stabilize it right now, add this as dependecy to your project:
 ```bash
 core_simd = { git = "https://github.com/rust-lang/stdsimd" }
 ```
