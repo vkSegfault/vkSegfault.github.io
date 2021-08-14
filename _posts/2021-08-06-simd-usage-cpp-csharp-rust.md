@@ -176,7 +176,7 @@ rustflags = [ "-C", "target-feature=+avx,+avx2" ]
 ```
 > **rustflags** have precedence over **attributes** !
 
-> Although this post is not Windows focused it's also worth to mention that since *Visual Studio 19* we can use MSVC switch `-openmp:experimental` which is superset of previously available `-openmp`. Now before loop you want to vectorize just add `#pragma omp simd simdlen(x)`. You can read more [here](https://devblogs.microsoft.com/cppblog/simd-extension-to-c-openmp-in-visual-studio/) about more clauses that let you modify how this pragma works.
+> Although this post is not Windows focused it's also worth to mention that since *Visual Studio 19* we can use MSVC switch `-openmp:experimental` which is superset of previously available `-openmp`. Now before loop you want to vectorize just add `#pragma omp simd simdlen(x)`. You can read more [here](https://devblogs.microsoft.com/cppblog/simd-extension-to-c-openmp-in-visual-studio/) about other clauses that let you modify how this pragma works.
 
 ## Bonus - veryfing assembly
 As small bonus: let's see how to check if our binaries are actually using AVX instructions. In C++ and Rust it's pretty straightforward, we have already compiled blob so we can use well known tool called **objdump** (*readelf* or *nm* will also do, if that's what you prefer):
