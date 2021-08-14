@@ -167,7 +167,7 @@ core_simd = { git = "https://github.com/rust-lang/stdsimd" }
 
 ### Compiler flags
 
-One more thing worth mentioning are compiler flags. While CLR doesn't need anything, compilers for C++ and Rust must provide information what characteristics of CPU we want to activate. For GCC (unless it's SSE which can be compiled right away) we need to pass **-mavx** or **-march=native**. Although this post is not Windows focused it's also worth to mention that since *Visual Studio 19* we can use MSVC switch `-openmp:experimental` which is superset of previously available `-openmp`. Now before loop you want to vectorize just add `#pragma omp simd simdlen(x)`. You can read more [here](https://devblogs.microsoft.com/cppblog/simd-extension-to-c-openmp-in-visual-studio/) about more clauses that let you modify how this pragma works.
+One more thing worth mentioning are compiler flags. While CLR doesn't need anything, compilers for C++ and Rust must provide information what characteristics of CPU we want to activate. For GCC (unless it's SSE which can be compiled right away) we need to pass **-mavx** or **-march=native**.
 
 Rustc on the other hand needs specific rustflags in .cargo/config.toml:
 ```toml
@@ -175,6 +175,8 @@ Rustc on the other hand needs specific rustflags in .cargo/config.toml:
 rustflags = [ "-C", "target-feature=+avx,+avx2" ]
 ```
 > **rustflags** have precedence over **attributes** !
+
+> Although this post is not Windows focused it's also worth to mention that since *Visual Studio 19* we can use MSVC switch `-openmp:experimental` which is superset of previously available `-openmp`. Now before loop you want to vectorize just add `#pragma omp simd simdlen(x)`. You can read more [here](https://devblogs.microsoft.com/cppblog/simd-extension-to-c-openmp-in-visual-studio/) about more clauses that let you modify how this pragma works.
 
 ## Bonus - veryfing assembly
 As small bonus: let's see how to check if our binaries are actually using AVX instructions. In C++ and Rust it's pretty straightforward, we have already compiled blob so we can use well known tool called **objdump** (*readelf* or *nm* will also do, if that's what you prefer):
