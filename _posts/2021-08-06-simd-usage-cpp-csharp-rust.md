@@ -22,7 +22,7 @@ C++ has no standarized SIMD usage at all, even for SSE instructions introduced 2
 #include <nmmintrin.h>   //SSE4.2
 #include <immintrin.h>   //AVX, AVX2, AVX-512
 ```
-All SSE includes give us `__m128` types while `immintrin.h` results in `__m256` and `__m512`. Although we have only this raw approach for now there is some work happening to standarize it in [future](https://en.cppreference.com/w/cpp/experimental/simd). It's worth mentioning that in the 90's ``valarray`` has been introduced.  Where vector and array are just templated containers without any mathematical meaning, vallarray was concept of array conataining numbers only, which can execute wide operations. Unfortunatelly development stalled and till today there is no exact matching to SIMD inctructions, so we must rely on auto vectorization.
+All SSE includes give us `__m128` types while `immintrin.h` results in `__m256` and `__m512`. Although we have only this raw approach for now there is some work happening to standarize it in [future](https://en.cppreference.com/w/cpp/experimental/simd). It's worth mentioning that in the 90's ``valarray`` has been introduced.  Where vector and array are just templated containers without any mathematical meaning, vallarray was concept of array containing numbers only, which can execute wide operations. Unfortunatelly development stalled and till today there is no exact matching to SIMD inctructions, so we must rely on auto vectorization.
 
 At the other end of the spectrum there have been C# which had fully standarized SIMD usage ever since .NET Core 3.0. We don't have to bother about any intrinsics directly, everything is under nice high level constructs:
 ```c#
@@ -58,7 +58,7 @@ C# on the other hand does everything fully safe and potentially faster (!). At l
 ```c#
 var lanes = Vector<int>.Count;
 ```
-Of course, it implicitly matches to SSE (4 lanes), AVX (8 lanes), AVX-512 (16 lanes) or - in case of no SIMD inctructions detected - scalar (1 lanes). While C++ and Rust must compile AOT and assume what is typical hardware your program will run on, C# doesn't need to. CLR compiles it JIT dynamically checking on what CPU it's running. If it finds that we are using  CPU modern enough to support e.g.: AVX-512, why bother with something less wide? This is really elegant way to acomplish portable SIMD usage comparing to C++ and Rust which must struggle with compile time decisions.
+Of course, it implicitly matches to SSE (4 lanes), AVX (8 lanes), AVX-512 (16 lanes) or - in case of no SIMD inctructions detected - scalar (1 lane). While C++ and Rust must compile AOT and assume what is typical hardware your program will run on, C# doesn't need to. CLR compiles it JIT dynamically checking on what CPU it's running. If it finds that we are using  CPU modern enough to support e.g.: AVX-512, why bother with something less wide? This is really elegant way to acomplish portable SIMD usage comparing to C++ and Rust which must struggle with compile time decisions.
 
 Rust has some neat syntax to create different functions per every instruction family and then dynamically decide which one to run. First to hint **rustc** to compile some function with avx we need feature attribute:
 ```rust
