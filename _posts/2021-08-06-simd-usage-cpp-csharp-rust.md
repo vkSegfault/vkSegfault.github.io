@@ -167,7 +167,9 @@ core_simd = { git = "https://github.com/rust-lang/stdsimd" }
 
 ### Compiler flags
 
-One more thing worth mentioning are compiler flags. While CLR doesn't need anything, compilers for C++ and Rust must provide information what characteristics of CPU we want to activate. For GCC (unless it's SSE which can be compiled right away) we need to pass **-mavx** or **-march=native**. Rustc on the other hand needs specific rustflags in .cargo/config.toml:
+One more thing worth mentioning are compiler flags. While CLR doesn't need anything, compilers for C++ and Rust must provide information what characteristics of CPU we want to activate. For GCC (unless it's SSE which can be compiled right away) we need to pass **-mavx** or **-march=native**. Although this post is not Windows focused it's also worth to mention that since *Visual Studio 19* we can use MSVC switch `-openmp:experimental` which is superset of previously available `-openmp`. Then before loop you want to vectorize just add `#pragma omp simd simdlen(x)`. You can read more [here](https://devblogs.microsoft.com/cppblog/simd-extension-to-c-openmp-in-visual-studio/) about more clauses that let you modify how this pragma works.
+
+Rustc on the other hand needs specific rustflags in .cargo/config.toml:
 ```toml
 [build]
 rustflags = [ "-C", "target-feature=+avx,+avx2" ]
