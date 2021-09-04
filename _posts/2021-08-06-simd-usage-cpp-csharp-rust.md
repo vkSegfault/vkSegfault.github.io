@@ -58,7 +58,7 @@ C# on the other hand does everything fully safe and potentially faster (!). At l
 ```c#
 var lanes = Vector<int>.Count;
 ```
-Of course, it implicitly matches to SSE (4 lanes), AVX (8 lanes), AVX-512 (16 lanes) or - in case of no SIMD inctructions detected - scalar (1 lane). While C++ and Rust must compile AOT and assume what is typical hardware your program will run on, C# doesn't need to. CLR compiles it JIT dynamically checking on what CPU it's running. If it finds that we are using  CPU modern enough to support e.g.: AVX-512, why bother with something less wide? This is really elegant way to acomplish portable SIMD usage comparing to C++ and Rust which must struggle with compile time decisions.
+Of course, it implicitly matches to SSE (4 lanes), AVX (8 lanes), AVX-512 (16 lanes) or - in case of no SIMD inctructions detected - scalar (1 lane). While C++ and Rust must compile AOT and assume what is typical hardware your program will run on, C# doesn't need to. CLR compiles it dynamically checking on what CPU it's running. If it finds that we are using  CPU modern enough to support e.g.: AVX-512, why bother with something less wide? This is really elegant way to acomplish portable SIMD usage comparing to C++ and Rust which must struggle with compile time decisions.
 
 Rust has some neat syntax to create different functions per every instruction family and then dynamically decide which one to run. First to hint **rustc** to compile some function with avx we need feature attribute:
 ```rust
