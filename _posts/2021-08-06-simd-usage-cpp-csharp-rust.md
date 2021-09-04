@@ -68,7 +68,7 @@ and we can prepare many other functions for every use case e.g.: SSE, AVX, AVX-5
 ```rust
 if is_x86_feature_detected!( "avx" ) {
 ```
-We can check (also) statically whether particular target feature is enabled 
+We can also check statically whether particular target feature is enabled 
 ```rust
 #[cfg(target_feature = "avx")]
 fn foo() {   //foo is only compiled when avx is enabled
