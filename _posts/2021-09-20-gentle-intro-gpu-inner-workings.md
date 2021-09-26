@@ -4,7 +4,7 @@ categories: [GPU]
 tags: [gpu, low-level, hardware]     # TAG names should always be lowercase
 ---
 
-This article summarizes some lower level aspect of how GPU executes. Although GPU programming is not *that* complicated when compared to CPU, it also doesn’t match to what hardware is doing exactly. The reason is that we can’t just program GPU without some API, which is an abstraction over its inner workings. Since, few years now we have modern explicit APIs like DirectX 12 or Vulkan which shrunken the gap to what is happening with hardware. Yet there still are few low-level bits (pun intended) that are worth explaining.
+This article summarizes some lower level aspect of how GPU executes. Although GPU programming is not that complicated when compared to CPU, it also doesn’t match to what hardware is doing exactly. The reason is that we can’t just program GPU without some API, which is an abstraction over its inner workings. Since few years now, we have modern explicit APIs like DirectX 12 or Vulkan, which shrunken the gap to what is happening with hardware. Yet there still are few low-level bits (pun intended) that are worth explaining.
 
 > Note from author: although this post is not about any graphics or compute API, I will use some names that come from Vulkan, mainly because it’s the only *modern and multi-platform* API out there.
 
