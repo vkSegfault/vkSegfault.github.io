@@ -180,7 +180,7 @@ For the Nvidia we have 2 choices:
 
 AMD:
 - [AMDVLK](https://github.com/GPUOpen-Drivers/AMDVLK) - open source version
-- [Mesa 3D](https://www.mesa3d.org/) - driver library that provides open source driver (mostly copy of AMD-VLK), most popular choice when it comes to AMD
+- [Mesa 3D](https://www.mesa3d.org/) - 3D library that provides open source radv driver, most popular choice when it comes to AMD
 - AMD Proprietary AMDGPU-PRO
 
 Intel:
