@@ -83,7 +83,7 @@ if cfg!(target_feature = "avx") {
 Please note that all fn's that use **std::arch** module must be marked as **unsafe**!
 
 ## Example
-Here we have simple loop example for every language that sums 256 bits vector from a big array.
+Here we have simple loop example for every language that sums 256 bits vector from a big array. All examples below are also hosted on [Gitlab](https://gitlab.com/adtofaust/simd-comparison).
 
 > For the sake of simplicity below code snippets don't handle cases where array is not multiple of SIMD width (thus array's size is set on purpose to be multiple of 8). In production-ready code you need either add padding to array to match SIMD width or handle not aligned end of array with second loop using scalar version.
 
