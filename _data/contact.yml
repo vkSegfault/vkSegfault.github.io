@@ -11,9 +11,9 @@
   type: email
   icon: 'fas fa-envelope'
   noblank: true            # open link in current tab
--
-  type: github
-  icon: 'fab fa-gitlab'
+# -
+#  type: github
+#  icon: 'fab fa-gitlab'
 -
   type: rss
   icon: 'fas fa-rss'
