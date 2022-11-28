@@ -1,7 +1,7 @@
 ---
 title: Hosting Godot 4 server on AWS and Azure
-categories: [cloud, godot]
-tags: [godot, aws, azure, python, terraform]     # TAG names should always be lowercase
+categories: [cloud, godot, aws, azure, terraform]
+tags: [godot, aws, azure, python, boto3, terraform]     # TAG names should always be lowercase
 ---
 
 Godot is slowly[^1] getting to release of version 4 - probably biggest update to date. Most interesting from our perspective is rewritten networking part. While there is stable Godot 3 relase as well, basically everyone is watching out for new major version. Some gamedevelopers will jump on this bandwagon soon (and some of them probably did it already). **In this article we will take a look how to setup Godot 4 server in headless mode and host it on 2 most popular public cloud provides: AWS and Azure.**
@@ -182,7 +182,7 @@ try:
     )
 
     iam.attach_role_policy(
-		RoleName='godot-role',
+        RoleName='godot-role',
         PolicyArn=policy_arn
     )
 
@@ -479,7 +479,7 @@ resource "azurerm_network_interface" "nic" {
     name                          = "ipconfig"
     subnet_id                     = azurerm_subnet.sub1.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id = azurerm_public_ip.pubip1.id
+    public_ip_address_id          = azurerm_public_ip.pubip1.id
   }
 }
 
@@ -489,7 +489,7 @@ resource "azurerm_network_interface_security_group_association" "example" {
   network_security_group_id = azurerm_network_security_group.nsg.id
 }
 ```
- **In `azurerm_public_ip` block we may use `Dynamic` allocation, but then we must use `data` block as well to fetch it.
+ **In `azurerm_public_ip` block we may use `Dynamic` allocation, but then we must use `data` block as well to fetch it.**
 
 The last thing we need to do is actually spawn 1 VM of Ubuntu 22.04 and remotely exec installation of all dependencies, fetch Godot sevrer binary from Azure Blob and run it.
 
