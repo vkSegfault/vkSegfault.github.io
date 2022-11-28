@@ -545,9 +545,9 @@ resource "azurerm_linux_virtual_machine" "godot-vm" {
 }
 ```
 
-> Instead of `az` CLI utility we can use handy `azcopy`: 
-> `wget https://aka.ms/downloadazcopy-v10-linux`
-> `tar -xvf downloadazcopy-v10-linux && cd azcopy_linux_amd64_10.16.2/`
+> Instead of `az` CLI utility we can use handy `azcopy`:
+> `wget https://aka.ms/downloadazcopy-v10-linux`, 
+> `tar -xvf downloadazcopy-v10-linux && cd azcopy_linux_amd64_10.16.2/`, 
 > `./azcopy copy 'https://uniquegodotstorage9876.blob.core.windows.net/container/Godot?<YOUR_SAS_TOKEN>' '.'`
 
 Now just call: 
