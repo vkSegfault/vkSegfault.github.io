@@ -20,7 +20,7 @@ If you want take a shallow dive on what's new with networking in Godot 4 take a 
 
 With newly baked networking system for Godot 4 setting up networking is much more pleasant and intuitive than it was with Godot 3.
 First we need to set some variables upfront:
-```gd
+```gdscript
 var ADDRESS: String
 const PORT = 12077
 const MAX_PLAYERS = 8
@@ -31,7 +31,7 @@ Use any random port above `9999`.  The `server` variable will hold info whether 
 > We use `server` flag to have control over whether it should be *server only* or *server as peer*, in latter case we can host game and act as player similiar to any other clients.
 
 So now we are ready to spin up our server:
-```gd
+```gdscript
 func _ready():
   spawn_server()
 
@@ -47,7 +47,7 @@ We first create ENet peer instance and use it to create server. `multiplayer` is
 Now that we have working server we want to spawn new character everytime client joins and we achieve this with `_on_peer_connected()` function tied to `peer_connected` signal.
 
 `peer_connected` signal takes 1 arg that we will make use of:
-```gd
+```gdscript
 func _on_peer_connected(peer_id):
   var character = load("res://path/to/character.tscn")
   var char = character.instantiate()
@@ -67,7 +67,7 @@ Our code for server is ready, we just need to add 1 more Node - **MultiplayerSpa
 > Note that Server and Client code may be merged into 1 file for simplicity and just execute proper path based whether it's server (cmdline arg) or client (paste IP and click Join button).
 
 On client side we need to be able to paste IP address that we want to connect to. We will use **LineEdit** node:
-```gd
+```gdscript
 var lineedit_ip = LineEdit.new()
 lineedit_ip.placeholder_text = "127.0.0.1"
 lineedit_ip.expand_to_text_length = true
@@ -75,7 +75,7 @@ self.add_child(lineedit_ip)
 ```
 
 To setup Godot client that will join our server we proceed almost exactly the same as with server setup:
-```gd
+```gdscript
 var peer = ENetMultiplayerPeer.new()
 ADDRESS = lineedit_ip.text
 peer.create_client(ADDRESS, PORT)
@@ -116,7 +116,7 @@ For simplicity we will use `pipenv run aws configure` to setup credentials.
 
 #### S3
 Now we need to create Bucket and upload our server there:
-```py
+```python
 s3 = boto3.client('s3', region_name="eu-central-1")
 
 bucket_name = "godot-server-totally-unique-name-987654321"
@@ -168,7 +168,7 @@ policy_dict = {
 ```
 
 Let's now actually create policy, role, instance profile and attach them all properly:
-```py
+```python
 try:
     policy = iam.create_policy(
         PolicyName = 'godot-policy',
@@ -196,7 +196,7 @@ except ClientError as e:
 #### EC2
 
 Now we are almost ready to deploy EC2 with all setup above. Last thing to do is to create Security Group that will allow ingress for UDP and TCP on ports 12077-12087 (Godot will use port provided at the beginning of this article and may use increments of this). Reason for this is that [default SG group created with EC2 allows all egress traffic but (fortunatelly) ingress from network interfaces that are using same SG only](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/default-custom-security-groups.html). Finally we provide *user data* to copy server from S3, install dependencies and actually run server:
-```py
+```python
 ec2 = boto3.client('ec2', region_name="eu-central-1")
 user_data = """sudo apt install -y libxcursor-dev libxinerama-dev libxrandr-dev libxi-dev &
             aws s3 cp s3://godot-server-totally-unique-name-987654321/GodotServer . &
@@ -258,7 +258,7 @@ What we are actually doing above: spawning 1 instance of Ubuntu 22.04 running on
 First we should tackle case of AZ credentials without checking it in into any repository. For this example we will proceed with `.tfvars` file that is also added to `.gitignore`.
 
 #### Access Azure from Terraform:
-```tf
+```terraform
 # vars.tfvars
 subscription_id = "<YOUR_SUB_ID>"
 tenant_id = "<YOUR_TENANT_ID>"
@@ -290,7 +290,7 @@ variable "client_secret" {
 ```
 
 #### Provider:
-```tf
+```terraform
 terraform {
   required_providers {
     azurerm = {
@@ -316,7 +316,7 @@ provider "azurerm" {
 #### Resource Group
 
 We will use *West Europe* Region (Netherlands) for our Resource Group:
-```tf
+```terraform
 resource "azurerm_resource_group" "az-vm-rg" {
     name = "az-vm-rg"
     location = "westeurope"
@@ -326,7 +326,7 @@ resource "azurerm_resource_group" "az-vm-rg" {
 #### Blob Storage
 
 Now let's upload Godot server to Blob Storage:
-```tf
+```terraform
 resource "azurerm_storage_account" "storageaccount" {
     name = "uniquegodotstorage9876"
     resource_group_name = azurerm_resource_group.az-vm-rg.name
@@ -354,7 +354,7 @@ resource "azurerm_storage_blob" "blob" {
 #### Network Security Group Rules
 
 Next step is to setup networking. It consist of 2 different parts: network security group rules and virtual network itself. Let's first set firewall rules to allow Godot server speak over UDP and TCP and allow ssh-ing into our machine (used for `remote-exec` later on): 
-```tf
+```terraform
 locals {
   nsg_rules = {
 
@@ -427,7 +427,7 @@ We can squeeze up some security by limiting `source_address_prefix` to some adre
 #### Virtual Network
 
 Now we can set virtual network that will use rules above:
-```tf
+```terraform
 resource "azurerm_virtual_network" "vnet" {
   name                = "vnet"
   address_space       = ["10.0.0.0/16"]
