@@ -493,6 +493,61 @@ resource "azurerm_network_interface_security_group_association" "example" {
 
 The last thing we need to do is actually spawn 1 VM of Ubuntu 22.04 and remotely exec installation of all dependencies, fetch Godot sevrer binary from Azure Blob and run it.
 
+```terraform
+resource "azurerm_linux_virtual_machine" "godot-vm" {
+  name                  = "godot-vm"
+  resource_group_name   = azurerm_resource_group.az-vm-rg.name
+  location              = azurerm_resource_group.az-vm-rg.location
+  network_interface_ids = [azurerm_network_interface.nic.id]
+  size                  = "Standard_B1s"
+  admin_username        = "crazyadmin"
+  admin_password        = "Dinozaury1"
+  
+  # we can use separate resource "azurerm_ssh_public_key" instead
+  admin_ssh_key {   
+    username            = "crazyadmin"
+    public_key          = "${file("keys/key.pub")}"    
+  }
+  disable_password_authentication = false
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts-gen2"
+    version   = "latest"
+  }
+
+  os_disk { 
+    caching              = "ReadWrite" 
+    storage_account_type = "Standard_LRS" 
+  }
+
+
+    connection {
+      type        = "ssh"
+      host        = azurerm_public_ip.pubip1.ip_address
+      user        = azurerm_linux_virtual_machine.godot-vm.admin_username
+      password    = azurerm_linux_virtual_machine.godot-vm.admin_password
+      private_key = "${file("keys/key")}"
+      timeout     = "5m"
+    }
+
+    provisioner "remote-exec" {
+        inline = [
+            "sudo apt install -y libxcursor-dev libxinerama-dev libxrandr-dev libxi-dev",
+            "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash",
+            "az storage blob download --account-name ${azurerm_storage_account.storageaccount.name} -c ${azurerm_storage_container.container.name} -n ${azurerm_storage_blob.blob.name} --sas-token '${data.azurerm_storage_account_sas.sas_token.sas}'",
+            "./Godot --server --headless"
+        ]
+    }
+}
+```
+
+> Instead of `az` CLI utility we can use handy `azcopy`: 
+> `wget https://aka.ms/downloadazcopy-v10-linux`
+> `tar -xvf downloadazcopy-v10-linux && cd azcopy_linux_amd64_10.16.2/`
+> `./azcopy copy 'https://uniquegodotstorage9876.blob.core.windows.net/container/Godot?<YOUR_SAS_TOKEN>' '.'`
+
 Now just call: 
 1. `terraform init`
 2. `terraform plan -var-file=vars.tfstate -out=out.plan` 
