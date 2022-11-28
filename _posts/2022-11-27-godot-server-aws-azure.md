@@ -101,7 +101,7 @@ We will export our project into Linux executables so we can later use cloud prov
 
 > Note that ready binaries will work on your local network OOTB, as well just run 1 as server and others as clients.
 
-> Now we will deploy it to 2 popular cloud provides and just for fun we will use different way to do it.
+> Now we will deploy it to 2 popular cloud provides and just for fun we will use different ways to achieve it.
 
 ## Deploy server to AWS
 
