@@ -20,7 +20,7 @@ If you want take a shallow dive on what's new with networking in Godot 4 take a 
 
 With newly baked networking system for Godot 4 setting up networking is much more pleasant and intuitive than it was with Godot 3.
 First we need to set some variables upfront:
-```py
+```gd
 var ADDRESS: String
 const PORT = 12077
 const MAX_PLAYERS = 8
@@ -31,7 +31,7 @@ Use any random port above `9999`.  The `server` variable will hold info whether 
 > We use `server` flag to have control over whether it should be *server only* or *server as peer*, in latter case we can host game and act as player similiar to any other clients.
 
 So now we are ready to spin up our server:
-```js
+```gd
 func _ready():
   spawn_server()
 
@@ -47,7 +47,7 @@ We first create ENet peer instance and use it to create server. `multiplayer` is
 Now that we have working server we want to spawn new character everytime client joins and we achieve this with `_on_peer_connected()` function tied to `peer_connected` signal.
 
 `peer_connected` signal takes 1 arg that we will make use of:
-```js
+```gd
 func _on_peer_connected(peer_id):
   var character = load("res://path/to/character.tscn")
   var char = character.instantiate()
@@ -67,7 +67,7 @@ Our code for server is ready, we just need to add 1 more Node - **MultiplayerSpa
 > Note that Server and Client code may be merged into 1 file for simplicity and just execute proper path based whether it's server (cmdline arg) or client (paste IP and click Join button).
 
 On client side we need to be able to paste IP address that we want to connect to. We will use **LineEdit** node:
-```js
+```gd
 var lineedit_ip = LineEdit.new()
 lineedit_ip.placeholder_text = "127.0.0.1"
 lineedit_ip.expand_to_text_length = true
@@ -75,7 +75,7 @@ self.add_child(lineedit_ip)
 ```
 
 To setup Godot client that will join our server we proceed almost exactly the same as with server setup:
-```js
+```gd
 var peer = ENetMultiplayerPeer.new()
 ADDRESS = lineedit_ip.text
 peer.create_client(ADDRESS, PORT)
@@ -123,12 +123,12 @@ bucket_name = "godot-server-totally-unique-name-987654321"
 file = "/path/to/SuperGodotKart"
 
 try:
-		location = {'LocationConstraint': "eu-central-1"}
-    s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=location)
+  location = {'LocationConstraint': "eu-central-1"}
+  s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=location)
 
-    s3.upload_file(file, bucket_name, "SuperGodotKart.x86_64")
+  s3.upload_file(file, bucket_name, "SuperGodotKart.x86_64")
 except ClientError as e:
-    print(e)
+  print(e)
 ```
 
 #### IAM Policy and Role
@@ -258,7 +258,7 @@ What we are actually doing above: spawning 1 instance of Ubuntu 22.04 running on
 First we should tackle case of AZ credentials without checking it in into any repository. For this example we will proceed with `.tfvars` file that is also added to `.gitignore`.
 
 #### Access Azure from Terraform:
-```json
+```tf
 # vars.tfvars
 subscription_id = "<YOUR_SUB_ID>"
 tenant_id = "<YOUR_TENANT_ID>"
@@ -266,7 +266,7 @@ client_id = "<YOUR_CLIENT_ID>"
 client_secret = "<YOUR_CLIENT_SECRET>"
 ```
 
-```json
+```tf
 # vars.tf
 variable "subscription_id" {
   type = string
@@ -290,7 +290,7 @@ variable "client_secret" {
 ```
 
 #### Provider:
-```json
+```tf
 terraform {
   required_providers {
     azurerm = {
@@ -316,7 +316,7 @@ provider "azurerm" {
 #### Resource Group
 
 We will use *West Europe* Region (Netherlands) for our Resource Group:
-```json
+```terraform
 resource "azurerm_resource_group" "az-vm-rg" {
     name = "az-vm-rg"
     location = "westeurope"
