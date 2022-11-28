@@ -557,7 +557,7 @@ Now just call:
 
 As you can see, logic here is more or less similar to what we did with AWS and Boto3 earlier.
 
-> Note that you should always use versioning and resource-locking of your Terraform `state`.
+> Note that you should always use versioning and resource-locking of your Terraform `state`!
 
 
 ## Security measures
