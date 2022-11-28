@@ -491,6 +491,8 @@ resource "azurerm_network_interface_security_group_association" "example" {
 ```
  **In `azurerm_public_ip` block we may use `Dynamic` allocation, but then we must use `data` block as well to fetch it.**
 
+#### Virtual Machine
+
 The last thing we need to do is actually spawn 1 VM of Ubuntu 22.04 and remotely exec installation of all dependencies, fetch Godot sevrer binary from Azure Blob and run it.
 
 ```terraform
