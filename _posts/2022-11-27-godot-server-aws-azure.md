@@ -316,7 +316,7 @@ provider "azurerm" {
 #### Resource Group
 
 We will use *West Europe* Region (Netherlands) for our Resource Group:
-```terraform
+```tf
 resource "azurerm_resource_group" "az-vm-rg" {
     name = "az-vm-rg"
     location = "westeurope"
@@ -326,7 +326,7 @@ resource "azurerm_resource_group" "az-vm-rg" {
 #### Blob Storage
 
 Now let's upload Godot server to Blob Storage:
-```json
+```tf
 resource "azurerm_storage_account" "storageaccount" {
     name = "uniquegodotstorage9876"
     resource_group_name = azurerm_resource_group.az-vm-rg.name
@@ -354,7 +354,7 @@ resource "azurerm_storage_blob" "blob" {
 #### Network Security Group Rules
 
 Next step is to setup networking. It consist of 2 different parts: network security group rules and virtual network itself. Let's first set firewall rules to allow Godot server speak over UDP and TCP and allow ssh-ing into our machine (used for `remote-exec` later on): 
-```json
+```tf
 locals {
   nsg_rules = {
 
@@ -427,7 +427,7 @@ We can squeeze up some security by limiting `source_address_prefix` to some adre
 #### Virtual Network
 
 Now we can set virtual network that will use rules above:
-```json
+```tf
 resource "azurerm_virtual_network" "vnet" {
   name                = "vnet"
   address_space       = ["10.0.0.0/16"]
@@ -456,18 +456,18 @@ resource "azurerm_network_security_group" "nsg" {
 }
 
 resource "azurerm_network_security_rule" "nsg_rules" {
-    for_each                    = local.nsg_rules
-    name                        = each.key
-    priority                    = each.value.priority
-    direction                   = each.value.direction
-    access                      = each.value.access
-    protocol                    = each.value.protocol
-    source_port_range           = each.value.source_port_range
-    destination_port_range      = each.value.destination_port_range
-    source_address_prefix       = each.value.source_address_prefix
-    destination_address_prefix  = each.value.destination_address_prefix
-    resource_group_name         = azurerm_resource_group.az-vm-rg.name
-    network_security_group_name = azurerm_network_security_group.nsg.name
+  for_each                    = local.nsg_rules
+  name                        = each.key
+  priority                    = each.value.priority
+  direction                   = each.value.direction
+  access                      = each.value.access
+  protocol                    = each.value.protocol
+  source_port_range           = each.value.source_port_range
+  destination_port_range      = each.value.destination_port_range
+  source_address_prefix       = each.value.source_address_prefix
+  destination_address_prefix  = each.value.destination_address_prefix
+  resource_group_name         = azurerm_resource_group.az-vm-rg.name
+  network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
 resource "azurerm_network_interface" "nic" {
@@ -496,7 +496,7 @@ The last thing we need to do is actually spawn 1 VM of Ubuntu 22.04 and remotely
 Now just call: 
 1. `terraform init`
 2. `terraform plan -var-file=vars.tfstate -out=out.plan` 
-3.  and finally `terraform apply out.plan`.
+3.  and finally `terraform apply out.plan`
 
 As you can see, logic here is more or less similar to what we did with AWS and Boto3 earlier.
 
