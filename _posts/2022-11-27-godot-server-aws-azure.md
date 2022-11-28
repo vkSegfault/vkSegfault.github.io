@@ -493,7 +493,7 @@ resource "azurerm_network_interface_security_group_association" "example" {
 
 #### Virtual Machine
 
-The last thing we need to do is actually spawn 1 VM of Ubuntu 22.04 and remotely exec installation of all dependencies, fetch Godot sevrer binary from Azure Blob and run it.
+The last thing we need to do is: spin up 1 VM of Ubuntu 22.04 and remotely exec installation of all dependencies, fetch Godot server binary from Azure Blob and run it.
 
 ```terraform
 resource "azurerm_linux_virtual_machine" "godot-vm" {
