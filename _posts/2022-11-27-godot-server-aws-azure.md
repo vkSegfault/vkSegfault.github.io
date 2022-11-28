@@ -33,14 +33,14 @@ Use any random port above `9999`.  The `server` variable will hold info whether 
 So now we are ready to spin up our server:
 ```js
 func _ready():
-	spawn_server()
+  spawn_server()
 
 func spawn_server():
-	var peer = ENetMultiplayerPeer.new()
-	peer.create_server(PORT, MAX_PLAYERS)
-	multiplayer.multiplayer_peer = peer
+  var peer = ENetMultiplayerPeer.new()
+  peer.create_server(PORT, MAX_PLAYERS)
+  multiplayer.multiplayer_peer = peer
 	
-	peer.peer_connected.connect(_on_peer_connected)
+  peer.peer_connected.connect(_on_peer_connected)
 ``` 
 We first create ENet peer instance and use it to create server. `multiplayer` is global singleton that works over all nodes (we can set multiplayer per scene as well if needed).
 
@@ -49,10 +49,10 @@ Now that we have working server we want to spawn new character everytime client 
 `peer_connected` signal takes 1 arg that we will make use of:
 ```js
 func _on_peer_connected(peer_id):
-	var character = load("res://path/to/character.tscn")
-	var char = character.instantiate()
-	char.name = str(id)
-	self.add_child(char)
+  var character = load("res://path/to/character.tscn")
+  var char = character.instantiate()
+  char.name = str(id)
+  self.add_child(char)
 ```
 The important part is assigning peer id to `.name`of scene (actually global node of this scene) - we will use it later to differniate between peers.
 
