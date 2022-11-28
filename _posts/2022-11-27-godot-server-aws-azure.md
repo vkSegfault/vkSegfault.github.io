@@ -204,7 +204,7 @@ user_data = """sudo apt install -y libxcursor-dev libxinerama-dev libxrandr-dev 
             ./GodotServer --server --headless"""
 
 try:
-	  sg = ec2.create_security_group(
+    sg = ec2.create_security_group(
         Description='Allow ingress for UDP/TCP on ports 12077-12087',
         GroupName='godot-sg'
     )
@@ -443,8 +443,8 @@ resource "azurerm_subnet" "sub1" {
 }
 
 resource "azurerm_public_ip" "pubip1"   { 
-   name   						 = "pubip1" 
-   location   				 = azurerm_resource_group.az-vm-rg.location 
+   name                = "pubip1" 
+   location            = azurerm_resource_group.az-vm-rg.location 
    resource_group_name = azurerm_resource_group.az-vm-rg.name 
    allocation_method   = "Static"
  } 
