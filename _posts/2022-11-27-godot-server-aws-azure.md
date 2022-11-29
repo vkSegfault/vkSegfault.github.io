@@ -4,7 +4,7 @@ categories: [cloud, godot, aws, azure, terraform]
 tags: [godot, aws, azure, python, boto3, terraform]     # TAG names should always be lowercase
 ---
 
-Godot is slowly[^1] getting to release of version 4 - probably biggest update to date. Most interesting from our perspective is rewritten networking part. While there is stable Godot 3 relase as well, basically everyone is watching out for new major version. Some gamedevelopers will jump on this bandwagon soon (and some of them probably did it already). **In this article we will take a look how to setup Godot 4 server in headless mode and host it on 2 most popular public cloud provides: AWS and Azure.**
+Godot is slowly[^1] getting to release of version 4 - probably biggest update to date. Most interesting from our perspective is rewritten networking part. While there is stable Godot 3 relase as well, basically everyone is watching out for new major version. Some game developers will jump on this bandwagon soon (and some of them probably did it already). **In this article we will take a look how to setup Godot 4 server in headless mode and host it on 2 popular public cloud provides: AWS and Azure.**
 
 > Note that Godot 4 is currently in beta, there are bugs, some things might change before final release. It's definitely not production-ready release - keep it in mind. Nonetheless it's worth giving a shot just for new shiny networking.
 
@@ -54,7 +54,7 @@ func _on_peer_connected(peer_id):
   char.name = str(id)
   self.add_child(char)
 ```
-The important part is assigning peer id to `.name`of scene (actually global node of this scene) - we will use it later to differniate between peers.
+The important part is assigning peer id to `.name`of scene (actually global node of this scene) - we will use it later to differentiate between peers.
 
 ---
 
@@ -81,11 +81,11 @@ ADDRESS = lineedit_ip.text
 peer.create_client(ADDRESS, PORT)
 multiplayer.multiplayer_peer = peer
 ```
-Only difference is `.create_client()` instead of `_create_server()`. We use the address and port that are set up to this point.
+Only difference is `.create_client()` instead of `.create_server()`. We use the address and port that are set up to this point.
 
 ---
 
-Code above set client peer and now we need to make some preparations for actual Character scene. First thing is to add another great node provided by Godot 4 which is **MultiplayerSynchronizer**. Add it as child of root node and set *Root Path* to root node as well. Now the important part: click on MultiplayerSynchronizer node and on the bottom, alongside Debugger, Audio, etc tabs you should see new one: **Replication**. Click it and use `+` sign to add properties that should be synced across all connected peers: mainly position and rotation but it's up to you what are yours particular needs.
+Code above sets client peer and now we need to make some preparations for actual Character scene. First let's add another new great node provided by Godot 4 which is **MultiplayerSynchronizer**. Add it as child of root node of your Character scene and set *Root Path* to root node as well. Now the important part: click on MultiplayerSynchronizer node and on the bottom - alongside Debugger, Audio, etc tabs - you should see new one: **Replication**. Click it and use `+` sign to add properties that should be synced across all connected peers: mainly position and rotation but it's up to you what are yours particular needs.
 
 > Only properties added to MultiplayerSynchronizer will be replicated to other peers!
 
@@ -97,9 +97,9 @@ Then in `_process()` we just check `if synchronizer.is_multiplayer_authority()` 
 
 > For simplicity sake we mix both server and client side codebase into one file but in more production-ready environment it would be advised to separate them.
 
-We will export our project into Linux executables so we can later use cloud providers as hosting. Save everything and go to **Project --> Export**. Once there, add template for `Linux/X11` and click it. Tick *runnable*, set export path and for simplicity sake leave all other flags with default values.
+We will export our project into Linux executables so we can later use cloud providers as hosting. Save everything and go to **Project --> Export**. Once there, add template for `Linux/X11` and click it. Tick *runnable*, set export path and leave all other flags with default values.
 
-> Note that ready binaries will work on your local network OOTB, as well just run 1 as server and others as clients.
+> Note that ready binaries will work on your local network OOTB as well, just run 1 as server and others as clients.
 
 > Now we will deploy it to 2 popular cloud provides and just for fun we will use different ways to achieve it.
 
@@ -107,7 +107,7 @@ We will export our project into Linux executables so we can later use cloud prov
 
 > **For AWS we will use boto3**
 
-Binaries are just blob files with right permission so we will use S3 bucket to store it. We will use popular `pipenv` tool to install `boto3`:
+Binaries are just blob files with right permission so we will use S3 bucket to store it. We will use popular `pipenv` tool to install `boto3` in local isolated environment:
 ```bash
 pipenv --three
 pipenv install boto3 awscli
@@ -120,13 +120,13 @@ Now we need to create Bucket and upload our server there:
 s3 = boto3.client('s3', region_name="eu-central-1")
 
 bucket_name = "godot-server-totally-unique-name-987654321"
-file = "/path/to/SuperGodotKart"
+file = "/path/to/GodotServer"
 
 try:
   location = {'LocationConstraint': "eu-central-1"}
   s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=location)
 
-  s3.upload_file(file, bucket_name, "SuperGodotKart.x86_64")
+  s3.upload_file(file, bucket_name, "GodotServer.x86_64")
 except ClientError as e:
   print(e)
 ```
@@ -134,7 +134,7 @@ except ClientError as e:
 #### IAM Policy and Role
 
 Let's now create IAM role which will allow us access S3 bucket from EC2 instance. We will provide assume policy for Role creation first, so that EC2 will be able to call other services on our behalf:
-```json
+```python
 assume_policy_dict = {
     "Version": "2012-10-17",
     "Statement": [
@@ -154,7 +154,7 @@ assume_policy_dict = {
 ```
 
 and new explicit policy for what Principal can actually do:
-```json
+```python
 policy_dict = {
     "Version": "2012-10-17",
     "Statement": [
@@ -167,7 +167,7 @@ policy_dict = {
 }
 ```
 
-Let's now actually create policy, role, instance profile and attach them all properly:
+Let's now actually create policy, role, instance profile and attach them properly:
 ```python
 try:
     policy = iam.create_policy(
@@ -195,7 +195,7 @@ except ClientError as e:
 
 #### EC2
 
-Now we are almost ready to deploy EC2 with all setup above. Last thing to do is to create Security Group that will allow ingress for UDP and TCP on ports 12077-12087 (Godot will use port provided at the beginning of this article and may use increments of this). Reason for this is that [default SG group created with EC2 allows all egress traffic but (fortunatelly) ingress from network interfaces that are using same SG only](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/default-custom-security-groups.html). Finally we provide *user data* to copy server from S3, install dependencies and actually run server:
+Now we are almost ready to deploy EC2 with all setup above. Last thing to do is to create Security Group that will allow ingress for UDP and TCP on ports 12077-12087 (Godot will use port provided at the beginning of this article and may use increments of if - at least it's what debugger says). Main reason for this is that [default SG group created with EC2 allows all egress traffic but (fortunatelly) ingress from network interfaces that are using same SG only](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/default-custom-security-groups.html). Finally we provide *user data* to copy server from S3, install dependencies and actually run server:
 ```python
 ec2 = boto3.client('ec2', region_name="eu-central-1")
 user_data = """sudo apt install -y libxcursor-dev libxinerama-dev libxrandr-dev libxi-dev &
@@ -244,7 +244,7 @@ except ClientError as e:
     print(e)
 ```
 
-> Ami provided above is for Ubuntu 22.04 LTS and that's why OS-specific commands are for **apt**, if you choose to use Amazon Linux or RHEL please use `sudo yum install libXcursor libXinerama libXrandr libXi` instead.
+> Ami provided above is for Ubuntu 22.04 LTS and that's why OS-specific commands are for **apt**, if you choose to use any RHEL-based distro (like Amazon Linux) please use `sudo yum install libXcursor libXinerama libXrandr libXi` instead.
 
 > We used t2.micro just for this simple example. In production we should use beefy VMs (ideally with HVM support) like bigger T or even better: C family.
 
@@ -288,6 +288,7 @@ variable "client_secret" {
   sensitive = true
 }
 ```
+We are using `sensitive`  flag so that Terraform will never print this values nor store them in logs.
 
 #### Provider:
 ```terraform
@@ -353,7 +354,7 @@ resource "azurerm_storage_blob" "blob" {
 
 #### Network Security Group Rules
 
-Next step is to setup networking. It consist of 2 different parts: network security group rules and virtual network itself. Let's first set firewall rules to allow Godot server speak over UDP and TCP and allow ssh-ing into our machine (used for `remote-exec` later on): 
+Next step is networking setup. It consist of 2 different parts: network security group rules and virtual network itself. Let's first set firewall rules to allow Godot server speak over UDP and TCP and allow ssh-ing into our machine (used for `remote-exec` later on): 
 ```terraform
 locals {
   nsg_rules = {
@@ -493,7 +494,7 @@ resource "azurerm_network_interface_security_group_association" "example" {
 
 #### Virtual Machine
 
-The last thing we need to do is: spin up 1 VM of Ubuntu 22.04 and remotely exec installation of all dependencies, fetch Godot server binary from Azure Blob and run it.
+The last thing we need to do: spin up 1 VM of Ubuntu 22.04 and remotely exec installation of all dependencies, fetch Godot server binary from Azure Blob and run it.
 
 ```terraform
 resource "azurerm_linux_virtual_machine" "godot-vm" {
