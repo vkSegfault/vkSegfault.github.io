@@ -36,14 +36,14 @@ By default when we create new state it's called local. Meaning it's just file th
 To implement all above protective machanisms we first need to create another repository for separate infrastructure.
 
 We will use AWS for no other reason than it's most populat cloud provider. Region is up to you:
-```json
+```tf
 provider "aws" {
 	region = "us-east-1"
 }
 ```
 
 Now we need place to store actual state file somewhere, obvious choice is S3 so let's use it:
-```json
+```tf
 resource "aws_s3_bucket" "tf_state" {
 	bucket = "tf-state-bucket-totally-unique-name"
 	
@@ -95,7 +95,7 @@ resource "aws_dynamodb_table" "tf_state_locks" {
 
 now just run `terraform init` and `terraform apply` in this directory. Once S3 bucket and DynamoDB table have been created we need to go back to our original project (the one that will use above remote backend to store it's own state) and tell Terraform to use them as *remote backend*:
 
-```json
+```tf
 # this is within original tf project files, not one that created remote backend
 terraform {
   backend "s3" {
