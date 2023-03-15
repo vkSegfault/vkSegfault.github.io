@@ -14,7 +14,7 @@ If you want take a shallow dive on what's new with networking in Godot 4 take a 
 3. [ENet wrappers, WebRTC](https://godotengine.org/article/multiplayer-changes-godot-4-0-report-3)
 4. [Scene Replication](https://godotengine.org/article/multiplayer-changes-godot-4-0-report-4).
 
-> Note that we will deploy Godot server on AWS and Azure in fastest possible way, it's not neccesrily safest or properly structured.
+> Note that we will deploy Godot server on AWS and Azure in fastest possible way, it's not neccesrily safest nor properly structured.
 
 ## Setup Headless Godot Server
 
